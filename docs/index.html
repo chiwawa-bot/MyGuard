@@ -37,15 +37,40 @@
   <div class="loader">⏳</div>
   
   <script>
-    // 註冊 Service Worker(不等待完成)
+    // 檢測是否為 PWA 模式
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches 
+               || window.navigator.standalone === true
+               || document.referrer.includes('android-app://');
+    
+    console.log('📱 PWA 模式:', isPWA);
+    
+    // 註冊 Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/MyGuard/sw.js')
-        .then(() => console.log('✅ SW 註冊成功'))
-        .catch(err => console.error('❌ SW 註冊失敗:', err));
+        .then(registration => {
+          console.log('✅ Service Worker 註冊成功');
+          
+          // 如果是 PWA 模式,立即跳轉
+          if (isPWA) {
+            console.log('🚀 從 APP 啟動,立即跳轉');
+            window.location.replace('./pages/password.html');
+          } else {
+            // 瀏覽器模式,延遲 2 秒讓用戶有機會看到安裝提示
+            console.log('🌐 瀏覽器模式,延遲跳轉以便顯示安裝提示');
+            setTimeout(() => {
+              window.location.replace('./pages/password.html');
+            }, 2000);
+          }
+        })
+        .catch(err => {
+          console.error('❌ Service Worker 註冊失敗:', err);
+          // 失敗也跳轉
+          window.location.replace('./pages/password.html');
+        });
+    } else {
+      // 不支援 Service Worker,直接跳轉
+      window.location.replace('./pages/password.html');
     }
-    
-    // 立即跳轉,不等待
-    window.location.replace('./pages/password.html');
   </script>
 </body>
 </html>

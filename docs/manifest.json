@@ -1,7 +1,7 @@
 {
   "name": "MyGuard",
   "short_name": "MyGuard",
-  "start_url": "./pages/password.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
