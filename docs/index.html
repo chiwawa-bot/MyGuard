@@ -12,14 +12,8 @@
   <link rel="apple-touch-icon" href="/MyGuard/assets/icons/icon-192.png">
   <title>載入中...</title>
   <style>
-    :root {
-      color-scheme: light only;
-    }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    :root { color-scheme: light only; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: #F5F5F3;
       display: flex;
@@ -39,25 +33,19 @@
     }
   </style>
 </head>
-<script>
-  if ('serviceWorker' in navigator) {
-    console.log('🔍 開始註冊 Service Worker...');
-    navigator.serviceWorker.register('/MyGuard/sw.js')
-      .then(registration => {
-        console.log('✅ Service Worker 註冊成功');
-        console.log('📍 Scope:', registration.scope);
-        
-
-
-      })
-      .catch(err => {
-        console.error('❌ Service Worker 註冊失敗:', err);
-      });
-  }
-</script>
-
 <body>
   <div class="loader">⏳</div>
-
+  
+  <script>
+    // 註冊 Service Worker(不等待完成)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/MyGuard/sw.js')
+        .then(() => console.log('✅ SW 註冊成功'))
+        .catch(err => console.error('❌ SW 註冊失敗:', err));
+    }
+    
+    // 立即跳轉,不等待
+    window.location.replace('./pages/password.html');
+  </script>
 </body>
 </html>
