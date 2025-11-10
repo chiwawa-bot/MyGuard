@@ -40,19 +40,25 @@
 </head>
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/MyGuard/sw.js', {
-      scope: '/MyGuard/'
-    })
-      .then(() => console.log('✅ Service Worker 註冊成功'))
-      .catch(err => console.error('❌ Service Worker 註冊失敗:', err));
+    console.log('🔍 開始註冊 Service Worker...');
+    navigator.serviceWorker.register('/MyGuard/sw.js')
+      .then(registration => {
+        console.log('✅ Service Worker 註冊成功');
+        console.log('📍 Scope:', registration.scope);
+        
+        // 註冊成功後才跳轉
+        setTimeout(() => {
+          window.location.href = './pages/password.html';
+        }, 500);
+      })
+      .catch(err => {
+        console.error('❌ Service Worker 註冊失敗:', err);
+      });
   }
 </script>
 
 <body>
   <div class="loader">⏳</div>
-  <script>
-    // 自動跳轉到 password.html
-    window.location.href = './pages/password.html';
-  </script>
+
 </body>
 </html>
