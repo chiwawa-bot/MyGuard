@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>設定</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.5.27/jsrsasign-all-min.js"></script>
+  <style>
+:root {
+  color-scheme: light only;
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+         -webkit-tap-highlight-color: transparent; /* 統一關閉預設 tap highlight  */
+}
+
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: #F5F5F3;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  height: 100%;
+  overflow: hidden;
+}
+
+.container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 35px;
+  padding-top: calc(80px + var(--safe-area-top));
+  padding-bottom: calc(145px + var(--safe-area-bottom));
+  padding-left: max(35px, calc(35px + var(--safe-area-left)));
+  padding-right: max(35px, calc(35px + var(--safe-area-right)));
+  
+  /* 隱藏滾動條 */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.container::-webkit-scrollbar {
+  display: none;
+}
+
+.section {
+  background: #F5F5F3;
+  border-radius: 20px;
+  padding: 20px 45px;
+  margin-bottom: 50px;
+  box-shadow: 
+    3px 3px 6px rgba(163, 163, 163, 0.4),
+    -3px -3px 6px rgba(255, 255, 255, 0.9);
+}
+
+.section-title {
+  padding: 8px 5px 15px 5px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #717070;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-shadow:
+    2px 2px 3px #fffcfc,
+    -1px -1px 2px #9f9e9e;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  padding: 2px 1px 2px 5px;
+  display: block;
+  font-size: 13px;
+  color: #8c93a2;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 30px;
+  background: rgb(228, 222, 186);
+  font-size: 14px;
+  color: #333;
+  font-family: inherit;
+  box-shadow:
+    3px 3px 2px rgb(254, 255, 254),
+    inset 2px 2px 3px rgba(163, 163, 163, 0.5),
+    inset -2px -2px 2px rgba(163, 163, 163, 0.5);
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  box-shadow: 
+    inset 2px 2px 3px rgba(163, 163, 163, 0.5),
+    inset -2px -2px 3px rgba(230, 227, 218, 0.9);
+}
+
+textarea.form-input {
+  min-height: 65px;
+  resize: vertical;
+  font-family: monospace;
+  font-size: 12px;
+  border-radius: 20px;
+}
+
+.hint {
+  font-size: 12px;
+  color: #999;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+.save-btn {
+  padding: 15px 20px 15px 20px;
+  border: none;
+  border-radius: 60px;
+  background: #F5F5F3;
+  color: #738172;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 
+    2px 2px 3px rgba(163, 163, 163, 0.4),
+    -3px -3px 3px rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.save-btn:active {
+  box-shadow: 
+    inset 2px 2px 3px rgba(163, 163, 163, 0.5),
+    inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+}
+
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.reset-btn {
+  padding: 15px 20px 15px 20px;
+  margin-left: 30px;
+  border: none;
+  border-radius: 60px;
+  background: #F5F5F3;
+  color: #b78d8d;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 
+    2px 2px 3px rgba(163, 163, 163, 0.4),
+    -3px -3px 3px rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease;
+}
+
+.reset-btn:active {
+  box-shadow: 
+    inset 2px 2px 3px rgba(163, 163, 163, 0.5),
+    inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+}
+
+.message {
+  position: fixed;
+  top: calc(20px + var(--safe-area-top));
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px 30px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 
+    3px 3px 6px rgba(163, 163, 163, 0.4),
+    -3px -3px 6px rgba(255, 255, 255, 0.9);
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.message.show {
+  opacity: 1;
+}
+
+.message.success {
+  background: #eaebe9;
+  color: #6f8a75f8;
+}
+
+.message.error {
+  background: #eaebe9;
+  color: #d27a7aac;
+}
+
+.message.warning {
+  background: #eaebe9;
+  color: #9474159a;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="section">
+      <div class="section-title">
+        <span>SERVICE ACCOUNT</span>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Client Email</label>
+        <input type="email" id="clientEmail" class="form-input" placeholder="xxx@xxx.iam.gserviceaccount.com">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Private Key</label>
+        <textarea id="privateKey" class="form-input" placeholder="-----BEGIN PRIVATE KEY-----&#10;&#10;-----END  PRIVATE  KEY-----"></textarea>
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">
+        <span>SHEET ID </span>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">PASSWORD Sheet ID</label>
+        <input type="text" id="passwordSheetId" class="form-input">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">CREDIT CARD Sheet ID</label>
+        <input type="text" id="cardSheetId" class="form-input">
+      </div>
+      
+    </div>
+    
+    <div class="button-group">
+      <button class="save-btn" onclick="saveSettings()">SAVE</button>
+      <button class="reset-btn" onclick="resetSettings()">RESET</button>
+    </div>
+  </div>
+  
+  <div id="message" class="message"></div>
+  
+  <div id="footer-container"></div>
+  
+  <script src="../common.js"></script>
+  <script src="../sheet.js"></script>
+  <script src="./settings.js"></script>
+  <script>
+    initFooter('settings-btn');
+    loadSettings();
+  </script>
+</body>
+</html>
