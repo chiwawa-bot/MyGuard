@@ -15,7 +15,7 @@
     :root { color-scheme: light only; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: #4285f4; /* 統一用主題色 */
+      background: #F5F5F3;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -23,93 +23,99 @@
       height: 100vh;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      gap: 20px;
     }
     
-    /* APP Logo */
-    .app-logo {
-      width: 120px;
-      height: 120px;
-      background: white;
-      border-radius: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 60px;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    }
-    
-    .app-name {
-      color: white;
-      font-size: 32px;
-      font-weight: 600;
-      margin-bottom: 40px;
+    /* PWA 模式下隱藏所有內容 */
+    body.pwa-mode {
+      opacity: 0;
+      pointer-events: none;
     }
     
     .loader {
-      width: 40px;
-      height: 40px;
-      border: 4px solid rgba(255,255,255,0.3);
-      border-top-color: white;
-      border-radius: 50%;
+      font-size: 48px;
       animation: spin 1s linear infinite;
     }
-    
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
-    
-    /* 瀏覽器模式的額外提示 */
-    .install-hint {
-      position: absolute;
-      bottom: 40px;
-      color: rgba(255,255,255,0.9);
-      font-size: 14px;
+    .message {
+      font-size: 18px;
+      color: #666;
       text-align: center;
       padding: 0 20px;
-      display: none;
     }
-    
-    body.browser-mode .install-hint {
-      display: block;
+    .install-hint {
+      font-size: 14px;
+      color: #999;
+      text-align: center;
+      padding: 0 20px;
+      max-width: 400px;
     }
-    
-    body.browser-mode .loader {
-      display: none;
+    .continue-btn {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 16px;
+      background: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .continue-btn:hover {
+      background: #3367d6;
     }
   </style>
 </head>
 <body>
-  <div class="app-logo">🛡️</div>
-  <div class="app-name">MyGuard</div>
-  <div class="loader"></div>
-  <div class="install-hint">
-    點擊選單「新增至主畫面」<br>安裝完整版 APP
-  </div>
-  <button onclick="window.location.href='./pages/password.html'" 
-        style="margin-top: 20px; padding: 12px 24px; font-size: 16px; 
-               background: #4285f4; color: white; border: none; 
-               border-radius: 8px; cursor: pointer;">
-  繼續使用網頁版
-</button>
-
+  <div class="loader">⏳</div>
+  <div class="message">載入中...</div>
+  <div class="install-hint"></div>
+  <button class="continue-btn" onclick="window.location.href='./pages/password.html'">
+    繼續使用網頁版
+  </button>
+  
   <script>
-    const isPWA = window.matchMedia('(display-mode: standalone)').matches 
-               || window.navigator.standalone === true
-               || document.referrer.includes('android-app://');
-    
-    if (isPWA) {
-      // APP 模式:立即跳轉
-      window.location.replace('./pages/password.html');
-    } else {
-      // 瀏覽器模式:顯示安裝提示
-      document.body.classList.add('browser-mode');
+    // 🚀 關鍵:在頁面渲染前就檢測並跳轉
+    (function() {
+      const isPWA = window.matchMedia('(display-mode: standalone)').matches 
+                 || window.navigator.standalone === true
+                 || document.referrer.includes('android-app://');
       
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/MyGuard/sw.js')
-          .then(() => console.log('✅ SW 註冊成功'))
-          .catch(err => console.error('❌ SW 註冊失敗:', err));
+      if (isPWA) {
+        // 立即添加隱藏 class
+        document.body.classList.add('pwa-mode');
+        
+        // 立即跳轉,不等待任何東西
+        window.location.replace('./pages/password.html');
+        
+        // 防止腳本繼續執行
+        throw new Error('PWA redirect');
       }
+    })();
+    
+    // 以下代碼只在非 PWA 模式執行
+    const messageEl = document.querySelector('.message');
+    const hintEl = document.querySelector('.install-hint');
+    
+    // 註冊 Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/MyGuard/sw.js')
+        .then(registration => {
+          console.log('✅ Service Worker 註冊成功');
+          messageEl.textContent = '歡迎使用 MyGuard';
+          hintEl.innerHTML = '請點擊選單中的<br>「新增至主畫面」來安裝 APP';
+        })
+        .catch(err => {
+          console.error('❌ Service Worker 註冊失敗:', err);
+          messageEl.textContent = '載入失敗';
+          hintEl.textContent = '請重新整理頁面';
+        });
+    } else {
+      messageEl.textContent = '不支援 PWA';
+      hintEl.textContent = '請使用較新版本的瀏覽器';
     }
   </script>
 </body>
